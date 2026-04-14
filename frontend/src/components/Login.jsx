@@ -63,57 +63,60 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden"
-      style={{ background: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)' }}>
+    <div className="relative min-h-screen bg-black overflow-x-hidden font-display flex flex-col items-center justify-center">
+      {/* Background Video Layer */}
+      <div className="absolute inset-0 w-full h-full pointer-events-none">
+        <video 
+          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260217_030345_246c0224-10a4-422c-b324-070b7c0eceda.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover"
+        />
+        {/* 50% Black Overlay */}
+        <div className="absolute inset-0 bg-black/50"></div>
+      </div>
 
-      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 rounded-full opacity-20 animate-pulse-slow"
-        style={{ background: 'radial-gradient(circle, #6366f1, transparent)' }} />
-      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 rounded-full opacity-20 animate-pulse-slow"
-        style={{ background: 'radial-gradient(circle, #8b5cf6, transparent)', animationDelay: '1s' }} />
-      <div className="absolute top-1/2 left-1/4 w-64 h-64 rounded-full opacity-10 animate-pulse-slow"
-        style={{ background: 'radial-gradient(circle, #c084fc, transparent)', animationDelay: '2s' }} />
-
-      <div className="relative z-10 w-full max-w-md px-6 animate-slide-up">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
-            style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}>
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-            </svg>
+      <div className="relative z-10 w-full max-w-md px-6 animate-slide-up mt-8 mb-8">
+        <div className="text-center mb-8 flex flex-col items-center">
+          {/* Badge */}
+          <div className="flex items-center gap-2 bg-white/10 border border-white/20 rounded-[20px] px-4 py-1.5 backdrop-blur-sm mb-6 w-max">
+            <div className="w-1 h-1 bg-white rounded-full"></div>
+            <span className="text-[13px] font-medium whitespace-nowrap">
+              <span className="text-white/60">Welcome to </span>
+              <span className="text-white">Alumni Portal</span>
+            </span>
           </div>
-          <h1 className="text-3xl font-bold text-white">Alumni Portal</h1>
-          <p className="text-indigo-300 mt-1 text-sm">Welcome back! Sign in to continue</p>
+          <h1 className="text-gradient-web3 text-3xl md:text-4xl font-medium tracking-tight">Sign In</h1>
+          <p className="text-white/60 mt-2 text-sm max-w-xs leading-relaxed">Enter your credentials to access the secure network</p>
         </div>
 
-        <div className="glass rounded-3xl p-8 shadow-2xl">
-          <h2 className="text-2xl font-semibold text-white mb-6">Sign In</h2>
-
+        <div className="bg-black/60 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-indigo-300 text-sm font-medium mb-2">Full Name</label>
+              <label className="block text-white/80 text-sm font-medium mb-2">Full Name</label>
               <input id="login-name" type="text" name="name" value={form.name} onChange={handleChange}
                 placeholder="John Doe" required
-                className="input-glass w-full rounded-xl px-4 py-3 text-white placeholder-indigo-400 focus:ring-0" />
+                className="w-full rounded-xl bg-white/5 border border-white/20 px-4 py-3 text-white placeholder-white/30 focus:ring-1 focus:ring-white/50 focus:border-white/50 focus:outline-none transition-all" />
             </div>
             <div>
-              <label className="block text-indigo-300 text-sm font-medium mb-2">Email Address</label>
+              <label className="block text-white/80 text-sm font-medium mb-2">Email Address</label>
               <input id="login-email" type="email" name="email" value={form.email} onChange={handleChange}
                 placeholder="john@example.com" required
-                className="input-glass w-full rounded-xl px-4 py-3 text-white placeholder-indigo-400 focus:ring-0" />
+                className="w-full rounded-xl bg-white/5 border border-white/20 px-4 py-3 text-white placeholder-white/30 focus:ring-1 focus:ring-white/50 focus:border-white/50 focus:outline-none transition-all" />
             </div>
             <div>
-              <label className="block text-indigo-300 text-sm font-medium mb-2">Password</label>
+              <label className="block text-white/80 text-sm font-medium mb-2">Password</label>
               <input id="login-password" type="password" name="password" value={form.password} onChange={handleChange}
                 placeholder="••••••••" required
-                className="input-glass w-full rounded-xl px-4 py-3 text-white placeholder-indigo-400 focus:ring-0" />
+                className="w-full rounded-xl bg-white/5 border border-white/20 px-4 py-3 text-white placeholder-white/30 focus:ring-1 focus:ring-white/50 focus:border-white/50 focus:outline-none transition-all" />
             </div>
 
             {/* Admin code toggle */}
             <div>
               <button type="button" onClick={() => setShowAdminCode(!showAdminCode)}
-                className="text-indigo-400 text-xs hover:text-indigo-300 transition-colors flex items-center gap-1">
+                className="text-white/50 text-xs hover:text-white transition-colors flex items-center gap-1">
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                     d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -124,7 +127,7 @@ export default function Login() {
                 <input type="password" value={adminCode}
                   onChange={(e) => setAdminCode(e.target.value)}
                   placeholder="Enter admin code"
-                  className="input-glass w-full rounded-xl px-4 py-2.5 text-white placeholder-indigo-400 focus:ring-0 mt-2 text-sm" />
+                  className="w-full rounded-xl bg-white/5 border border-white/20 px-4 py-2.5 text-white placeholder-white/30 focus:ring-1 focus:ring-white/50 focus:border-white/50 focus:outline-none transition-all mt-2 text-sm" />
               )}
             </div>
 
@@ -132,29 +135,34 @@ export default function Login() {
             <div className="flex items-center gap-2">
               <input id="remember-me" type="checkbox" checked={remember}
                 onChange={(e) => setRemember(e.target.checked)}
-                className="w-4 h-4 rounded accent-indigo-500 cursor-pointer" />
-              <label htmlFor="remember-me" className="text-indigo-300 text-sm cursor-pointer select-none">
+                className="w-4 h-4 rounded accent-white border border-white/30 cursor-pointer" />
+              <label htmlFor="remember-me" className="text-white/70 text-sm cursor-pointer select-none">
                 Remember me
               </label>
             </div>
 
             <button id="login-submit" type="submit" disabled={loading}
-              className="btn-primary w-full py-3 rounded-xl text-white font-semibold text-base mt-2 disabled:opacity-70 disabled:cursor-not-allowed">
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                  </svg>
-                  Signing in...
+              className="pill-outer w-full mt-6 shadow-[0_4px_30px_rgba(255,255,255,0.2)] disabled:opacity-70 disabled:cursor-not-allowed group">
+              <div className="pill-inner-light py-[14px]">
+                <div className="pill-glow group-hover:opacity-100 transition-opacity" style={{ background: 'radial-gradient(ellipse at top, rgba(0, 0, 0, 0.4) 0%, transparent 70%)' }}></div>
+                <span className="text-black text-[15px] font-semibold relative z-10 flex items-center justify-center gap-2">
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                      </svg>
+                      Signing in...
+                    </>
+                  ) : 'Sign In'}
                 </span>
-              ) : 'Sign In'}
+              </div>
             </button>
           </form>
 
-          <p className="text-center text-indigo-400 text-sm mt-6">
+          <p className="text-center text-white/50 text-sm mt-6">
             Don't have an account?{' '}
-            <Link to="/register" className="text-indigo-300 font-semibold hover:text-white transition-colors">
+            <Link to="/register" className="text-white font-semibold hover:text-white/80 transition-colors">
               Create account
             </Link>
           </p>

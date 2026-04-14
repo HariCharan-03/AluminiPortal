@@ -18,7 +18,7 @@ export default function AlumniList({ refreshKey, isAdmin }) {
       const res = await axios.get('http://localhost:3000/alumni');
       if (res.data.success) setAlumni(res.data.data);
     } catch {
-      setError('Failed to connect to server. Make sure the backend is running on port 3000.');
+      setError('Failed to connect to server. Make sure the backend is running on port 5000.');
     } finally {
       setLoading(false);
     }

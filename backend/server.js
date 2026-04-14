@@ -84,7 +84,7 @@ db.connect((err) => {
     else console.log('✅ View alumni_summary ready');
   });
 
-  // Create TRIGGER: log every alumni insert into audit log
+  // Create TRIGGER 1: log every alumni INSERT into audit log
   db.query(`DROP TRIGGER IF EXISTS after_alumni_insert`, () => {
     db.query(`
       CREATE TRIGGER after_alumni_insert
@@ -95,8 +95,24 @@ db.connect((err) => {
         VALUES (NEW.id, NEW.name, 'INSERT');
       END
     `, (err) => {
-      if (err) console.error('❌ Failed to create trigger:', err.message);
+      if (err) console.error('❌ Failed to create INSERT trigger:', err.message);
       else console.log('✅ Trigger after_alumni_insert ready');
+    });
+  });
+
+  // Create TRIGGER 2: log every alumni DELETE into audit log
+  db.query(`DROP TRIGGER IF EXISTS after_alumni_delete`, () => {
+    db.query(`
+      CREATE TRIGGER after_alumni_delete
+      AFTER DELETE ON alumni
+      FOR EACH ROW
+      BEGIN
+        INSERT INTO alumni_audit_log (alumni_id, alumni_name, action)
+        VALUES (OLD.id, OLD.name, 'DELETE');
+      END
+    `, (err) => {
+      if (err) console.error('❌ Failed to create DELETE trigger:', err.message);
+      else console.log('✅ Trigger after_alumni_delete ready');
     });
   });
 
@@ -251,6 +267,126 @@ app.put('/alumni/:id', (req, res) => {
       console.log(`✅ Alumni updated (ID: ${id})`);
       res.json({ success: true, message: 'Alumni updated successfully' });
     });
+});
+
+// ─── ANALYTICS / STATS ROUTES ────────────────────────────────
+
+/**
+ * GET /stats
+ * Runs aggregate + JOIN queries and returns combined analytics data.
+ * Used by the Analytics tab in the frontend.
+ */
+app.get('/stats', (req, res) => {
+  const results = {};
+
+  // Query 1: Summary counts (aggregate)
+  const q1 = `
+    SELECT
+      (SELECT COUNT(*) FROM alumni)           AS total_alumni,
+      (SELECT COUNT(*) FROM users)            AS total_users,
+      (SELECT COUNT(*) FROM messages)         AS total_messages,
+      (SELECT COUNT(*) FROM alumni_audit_log) AS total_logs,
+      (SELECT ROUND(AVG(year), 0) FROM alumni) AS avg_year,
+      (SELECT MAX(year) FROM alumni)          AS max_year,
+      (SELECT MIN(year) FROM alumni)          AS min_year,
+      (SELECT COUNT(DISTINCT company) FROM alumni) AS unique_companies
+  `;
+
+  // Query 2: Alumni per company (GROUP BY + COUNT)
+  const q2 = `
+    SELECT company, COUNT(*) AS total
+    FROM alumni
+    GROUP BY company
+    ORDER BY total DESC
+  `;
+
+  // Query 3: Alumni per graduation year (GROUP BY)
+  const q3 = `
+    SELECT year, COUNT(*) AS graduates
+    FROM alumni
+    GROUP BY year
+    ORDER BY year DESC
+  `;
+
+  // Query 4: JOIN alumni with audit log (INNER JOIN)
+  const q4 = `
+    SELECT
+      a.name       AS alumni_name,
+      a.company,
+      a.year,
+      l.action,
+      l.logged_at
+    FROM alumni a
+    INNER JOIN alumni_audit_log l ON a.id = l.alumni_id
+    ORDER BY l.logged_at DESC
+    LIMIT 20
+  `;
+
+  // Query 5: LEFT JOIN — all alumni with or without audit entry
+  const q5 = `
+    SELECT
+      a.name       AS alumni_name,
+      a.year,
+      a.company,
+      COALESCE(l.action, 'No log') AS audit_action
+    FROM alumni a
+    LEFT JOIN alumni_audit_log l ON a.id = l.alumni_id
+    ORDER BY a.year DESC
+    LIMIT 10
+  `;
+
+  db.query(q1, (err, r1) => {
+    if (err) return res.status(500).json({ success: false, message: 'Stats query failed' });
+    results.summary = r1[0];
+
+    db.query(q2, (err, r2) => {
+      if (err) return res.status(500).json({ success: false, message: 'Company stats failed' });
+      results.byCompany = r2;
+
+      db.query(q3, (err, r3) => {
+        if (err) return res.status(500).json({ success: false, message: 'Year stats failed' });
+        results.byYear = r3;
+
+        db.query(q4, (err, r4) => {
+          if (err) return res.status(500).json({ success: false, message: 'JOIN query failed' });
+          results.auditJoin = r4;
+
+          db.query(q5, (err, r5) => {
+            if (err) return res.status(500).json({ success: false, message: 'LEFT JOIN query failed' });
+            results.leftJoin = r5;
+
+            console.log('✅ Stats endpoint served');
+            res.json({ success: true, data: results });
+          });
+        });
+      });
+    });
+  });
+});
+
+/**
+ * GET /audit-log
+ * Returns full audit log (all INSERT and DELETE events on alumni table).
+ */
+app.get('/audit-log', (req, res) => {
+  db.query(
+    'SELECT * FROM alumni_audit_log ORDER BY logged_at DESC LIMIT 50',
+    (err, rows) => {
+      if (err) return res.status(500).json({ success: false, message: 'Database error' });
+      res.json({ success: true, data: rows });
+    }
+  );
+});
+
+/**
+ * GET /view/alumni-summary
+ * Returns data from the alumni_summary VIEW.
+ */
+app.get('/view/alumni-summary', (req, res) => {
+  db.query('SELECT * FROM alumni_summary', (err, rows) => {
+    if (err) return res.status(500).json({ success: false, message: 'Database error' });
+    res.json({ success: true, data: rows });
+  });
 });
 
 // ─── MESSAGING ROUTES ─────────────────────────────────────────

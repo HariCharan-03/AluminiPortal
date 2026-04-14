@@ -35,74 +35,85 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden"
-      style={{ background: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)' }}>
+    <div className="relative min-h-screen bg-black overflow-x-hidden font-display flex flex-col items-center justify-center">
+      {/* Background Video Layer */}
+      <div className="absolute inset-0 w-full h-full pointer-events-none">
+        <video 
+          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260217_030345_246c0224-10a4-422c-b324-070b7c0eceda.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover"
+        />
+        {/* 50% Black Overlay */}
+        <div className="absolute inset-0 bg-black/50"></div>
+      </div>
 
-      <div className="absolute top-[-10%] right-[-10%] w-80 h-80 rounded-full opacity-20 animate-pulse-slow"
-        style={{ background: 'radial-gradient(circle, #8b5cf6, transparent)' }} />
-      <div className="absolute bottom-[-5%] left-[-5%] w-80 h-80 rounded-full opacity-15 animate-pulse-slow"
-        style={{ background: 'radial-gradient(circle, #6366f1, transparent)', animationDelay: '1.5s' }} />
-
-      <div className="relative z-10 w-full max-w-md px-6 py-8 animate-slide-up">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
-            style={{ background: 'linear-gradient(135deg, #8b5cf6, #6366f1)' }}>
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-            </svg>
+      <div className="relative z-10 w-full max-w-md px-6 animate-slide-up mt-8 mb-8">
+        <div className="text-center mb-8 flex flex-col items-center">
+          {/* Badge */}
+          <div className="flex items-center gap-2 bg-white/10 border border-white/20 rounded-[20px] px-4 py-1.5 backdrop-blur-sm mb-6 w-max">
+            <div className="w-1 h-1 bg-white rounded-full"></div>
+            <span className="text-[13px] font-medium whitespace-nowrap">
+              <span className="text-white/60">Join </span>
+              <span className="text-white">Alumni Portal</span>
+            </span>
           </div>
-          <h1 className="text-3xl font-bold text-white">Alumni Portal</h1>
-          <p className="text-indigo-300 mt-1 text-sm">Join your alumni community today</p>
+          <h1 className="text-gradient-web3 text-3xl md:text-4xl font-medium tracking-tight">Create Account</h1>
+          <p className="text-white/60 mt-2 text-sm max-w-xs leading-relaxed">Sign up to connect with your alumni community</p>
         </div>
 
-        <div className="glass rounded-3xl p-8 shadow-2xl">
-          <h2 className="text-2xl font-semibold text-white mb-6">Create Account</h2>
-
+        <div className="bg-black/60 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-indigo-300 text-sm font-medium mb-2">Full Name</label>
+              <label className="block text-white/80 text-sm font-medium mb-2">Full Name</label>
               <input id="register-name" type="text" name="name" value={form.name} onChange={handleChange}
                 placeholder="John Doe" required
-                className="input-glass w-full rounded-xl px-4 py-3 text-white placeholder-indigo-400 focus:ring-0" />
+                className="w-full rounded-xl bg-white/5 border border-white/20 px-4 py-3 text-white placeholder-white/30 focus:ring-1 focus:ring-white/50 focus:border-white/50 focus:outline-none transition-all" />
             </div>
             <div>
-              <label className="block text-indigo-300 text-sm font-medium mb-2">Email Address</label>
+              <label className="block text-white/80 text-sm font-medium mb-2">Email Address</label>
               <input id="register-email" type="email" name="email" value={form.email} onChange={handleChange}
                 placeholder="john@example.com" required
-                className="input-glass w-full rounded-xl px-4 py-3 text-white placeholder-indigo-400 focus:ring-0" />
+                className="w-full rounded-xl bg-white/5 border border-white/20 px-4 py-3 text-white placeholder-white/30 focus:ring-1 focus:ring-white/50 focus:border-white/50 focus:outline-none transition-all" />
             </div>
             <div>
-              <label className="block text-indigo-300 text-sm font-medium mb-2">Password</label>
+              <label className="block text-white/80 text-sm font-medium mb-2">Password</label>
               <input id="register-password" type="password" name="password" value={form.password} onChange={handleChange}
                 placeholder="Min. 6 characters" required
-                className="input-glass w-full rounded-xl px-4 py-3 text-white placeholder-indigo-400 focus:ring-0" />
+                className="w-full rounded-xl bg-white/5 border border-white/20 px-4 py-3 text-white placeholder-white/30 focus:ring-1 focus:ring-white/50 focus:border-white/50 focus:outline-none transition-all" />
             </div>
             <div>
-              <label className="block text-indigo-300 text-sm font-medium mb-2">Confirm Password</label>
+              <label className="block text-white/80 text-sm font-medium mb-2">Confirm Password</label>
               <input id="register-confirm" type="password" name="confirm" value={form.confirm} onChange={handleChange}
                 placeholder="Repeat password" required
-                className="input-glass w-full rounded-xl px-4 py-3 text-white placeholder-indigo-400 focus:ring-0" />
+                className="w-full rounded-xl bg-white/5 border border-white/20 px-4 py-3 text-white placeholder-white/30 focus:ring-1 focus:ring-white/50 focus:border-white/50 focus:outline-none transition-all" />
             </div>
 
 
             <button id="register-submit" type="submit" disabled={loading}
-              className="btn-primary w-full py-3 rounded-xl text-white font-semibold text-base mt-2 disabled:opacity-70 disabled:cursor-not-allowed">
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                  </svg>
-                  Creating account...
+              className="pill-outer w-full mt-6 shadow-[0_4px_30px_rgba(255,255,255,0.2)] disabled:opacity-70 disabled:cursor-not-allowed group">
+              <div className="pill-inner-light py-[14px]">
+                <div className="pill-glow group-hover:opacity-100 transition-opacity" style={{ background: 'radial-gradient(ellipse at top, rgba(0, 0, 0, 0.4) 0%, transparent 70%)' }}></div>
+                <span className="text-black text-[15px] font-semibold relative z-10 flex items-center justify-center gap-2">
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                      </svg>
+                      Creating account...
+                    </>
+                  ) : 'Create Account'}
                 </span>
-              ) : 'Create Account'}
+              </div>
             </button>
           </form>
 
-          <p className="text-center text-indigo-400 text-sm mt-6">
+          <p className="text-center text-white/50 text-sm mt-6">
             Already have an account?{' '}
-            <Link to="/login" className="text-indigo-300 font-semibold hover:text-white transition-colors">Sign in</Link>
+            <Link to="/login" className="text-white font-semibold hover:text-white/80 transition-colors">Sign in</Link>
           </p>
         </div>
       </div>

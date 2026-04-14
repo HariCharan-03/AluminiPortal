@@ -4,6 +4,7 @@ import axios from 'axios';
 import AlumniForm from './AlumniForm';
 import AlumniList from './AlumniList';
 import Messages from './Messages';
+import Analytics from './Analytics';
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -41,15 +42,27 @@ export default function Dashboard() {
   const tabs = [
     { id: 'list', label: 'Dashboard' },
     { id: 'messages', label: 'Messages' },
+    { id: 'analytics', label: 'Analytics' },
     ...(isAdmin ? [{ id: 'add', label: 'Add Alumni' }] : []),
   ];
 
   return (
-    <div className="min-h-screen"
-      style={{ background: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)' }}>
+    <div className="relative min-h-screen bg-black font-display text-white">
+      {/* Fixed Background Video Layer */}
+      <div className="fixed inset-0 w-full h-full pointer-events-none z-0">
+        <video 
+          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260217_030345_246c0224-10a4-422c-b324-070b7c0eceda.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/50"></div>
+      </div>
 
       {/* Navbar */}
-      <nav className="glass-dark sticky top-0 z-50 px-6 py-4">
+      <nav className="relative z-50 bg-black/60 backdrop-blur-xl border-b border-white/10 sticky top-0 px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center"
@@ -62,12 +75,6 @@ export default function Dashboard() {
             </div>
             <div>
               <span className="text-white font-bold text-lg tracking-tight">Alumni Portal</span>
-              {isAdmin && (
-                <span className="ml-2 text-xs px-2 py-0.5 rounded-lg font-semibold"
-                  style={{ background: 'rgba(251,191,36,0.2)', color: '#fbbf24', border: '1px solid rgba(251,191,36,0.3)' }}>
-                  👑 Admin
-                </span>
-              )}
             </div>
           </div>
 
@@ -75,8 +82,7 @@ export default function Dashboard() {
           <div className="hidden md:flex items-center gap-1">
             {tabs.map(tab => (
               <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${activeTab === tab.id ? 'text-white' : 'text-indigo-300 hover:text-white hover:bg-white/5'}`}
-                style={activeTab === tab.id ? { background: 'rgba(99,102,241,0.2)', border: '1px solid rgba(99,102,241,0.3)' } : {}}>
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all border border-transparent ${activeTab === tab.id ? 'bg-white/10 border-white/20 text-white' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>
                 {tab.label}
               </button>
             ))}
@@ -84,14 +90,13 @@ export default function Dashboard() {
 
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
-                style={{ background: isAdmin ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}>
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-black text-sm font-bold bg-white">
                 {user.name.charAt(0).toUpperCase()}
               </div>
               <span className="text-white text-sm font-medium hidden sm:block">Welcome, {user.name}</span>
             </div>
             <button id="logout-btn" onClick={handleLogout}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all">
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all border border-transparent hover:border-red-500/20">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -103,46 +108,49 @@ export default function Dashboard() {
       </nav>
 
       {/* Mobile nav */}
-      <div className="md:hidden flex gap-2 px-4 pt-4 overflow-x-auto">
+      <div className="relative z-10 md:hidden flex gap-2 px-4 pt-4 overflow-x-auto bg-black/40 backdrop-blur-md pb-2">
         {tabs.map(tab => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-            className={`flex-shrink-0 px-3 py-2 rounded-xl text-sm font-medium transition-all ${activeTab === tab.id ? 'text-white' : 'text-indigo-300'}`}
-            style={activeTab === tab.id ? { background: 'rgba(99,102,241,0.2)', border: '1px solid rgba(99,102,241,0.3)' } : { background: 'rgba(255,255,255,0.05)' }}>
+            className={`flex-shrink-0 px-3 py-2 rounded-xl text-sm font-medium transition-all border ${activeTab === tab.id ? 'bg-white/10 border-white/20 text-white' : 'bg-transparent border-transparent text-white/50'}`}>
             {tab.label}
           </button>
         ))}
       </div>
 
-      <main className="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
+      <main className="relative z-10 max-w-6xl mx-auto px-4 py-8 animate-fade-in w-full">
         {/* Welcome banner */}
-        <div className="glass rounded-2xl p-6 mb-8"
-          style={{ background: isAdmin ? 'linear-gradient(135deg, rgba(245,158,11,0.15), rgba(99,102,241,0.15))' : 'linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.2))' }}>
+        <div className="bg-black/60 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl mb-8">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-white">
-                Welcome back, <span className="text-gradient">{user.name}</span> {isAdmin ? '👑' : '👋'}
+              <h1 className="text-2xl font-bold text-white tracking-tight">
+                Welcome back, <span className="text-gradient-web3">{user.name}</span>
               </h1>
-              <p className="text-indigo-300 text-sm mt-1">
+              <p className="text-white/60 text-sm mt-2 max-w-md">
                 {isAdmin ? 'Admin access: add, edit, delete alumni. Chat with the network.' : 'Search alumni, send messages, and request referrals.'}
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-4 items-center">
               <button onClick={() => setActiveTab('messages')}
-                className="px-4 py-2.5 rounded-xl text-sm font-semibold text-indigo-300 flex items-center gap-2 transition-all hover:text-white"
-                style={{ background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)' }}>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-                Messages
+                className="pill-outer group">
+                <div className="pill-inner-dark py-[8px] px-[20px] gap-2">
+                  <div className="pill-glow group-hover:opacity-100 transition-opacity"></div>
+                  <svg className="w-4 h-4 text-white relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                  <span className="text-white text-[13px] font-medium relative z-10">Messages</span>
+                </div>
               </button>
               {isAdmin && (
                 <button onClick={() => setActiveTab('add')}
-                  className="btn-primary px-4 py-2.5 rounded-xl text-white text-sm font-semibold flex items-center gap-2">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  Add Alumni
+                  className="pill-outer group">
+                  <div className="pill-inner-light py-[8px] px-[20px] gap-2">
+                    <div className="pill-glow group-hover:opacity-100 transition-opacity" style={{ background: 'radial-gradient(ellipse at top, rgba(0, 0, 0, 0.4) 0%, transparent 70%)' }}></div>
+                    <svg className="w-4 h-4 text-black relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span className="text-black text-[13px] font-medium relative z-10">Add Alumni</span>
+                  </div>
                 </button>
               )}
             </div>
@@ -155,6 +163,9 @@ export default function Dashboard() {
         )}
         {activeTab === 'messages' && (
           <Messages currentUser={user.name} alumni={alumni} />
+        )}
+        {activeTab === 'analytics' && (
+          <Analytics />
         )}
         {activeTab === 'add' && isAdmin && (
           <AlumniForm onAlumniAdded={handleAlumniAdded} />

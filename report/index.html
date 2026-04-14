@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alumni Portal – DBMS Final Project Report</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & Base ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f0c29;
+      --surface:   rgba(255,255,255,0.05);
+      --border:    rgba(255,255,255,0.10);
+      --indigo:    #6366f1;
+      --violet:    #8b5cf6;
+      --cyan:      #22d3ee;
+      --green:     #4ade80;
+      --pink:      #f472b6;
+      --yellow:    #fbbf24;
+      --text:      #e2e8f0;
+      --muted:     #94a3b8;
+      --accent:    #818cf8;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    /* ── Layout ───────────────────────────────────────────── */
+    .container { max-width: 960px; margin: 0 auto; padding: 0 2rem; }
+
+    /* ── Sidebar TOC ──────────────────────────────────────── */
+    .layout { display: flex; gap: 0; min-height: 100vh; }
+
+    .toc {
+      width: 260px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      background: rgba(0,0,0,0.3);
+      border-right: 1px solid var(--border);
+      padding: 2rem 1.5rem;
+    }
+
+    .toc h3 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .toc a {
+      display: block;
+      padding: 0.45rem 0.8rem;
+      border-radius: 8px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      transition: all 0.2s;
+      margin-bottom: 2px;
+    }
+
+    .toc a:hover { background: rgba(99,102,241,0.15); color: var(--accent); }
+    .toc a.active { background: rgba(99,102,241,0.2); color: #c7d2fe; }
+    .toc .toc-sub { padding-left: 1.5rem; font-size: 12px; }
+
+    .content { flex: 1; padding: 3rem 3rem 6rem; min-width: 0; }
+
+    /* ── Cover Page ───────────────────────────────────────── */
+    .cover {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: radial-gradient(ellipse at 60% 30%, rgba(99,102,241,0.25) 0%, transparent 60%),
+                  radial-gradient(ellipse at 20% 80%, rgba(139,92,246,0.2) 0%, transparent 55%),
+                  linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      padding: 4rem 2rem;
+      position: relative;
+      overflow: hidden;
+      page-break-after: always;
+    }
+
+    .cover::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .cover-badge {
+      display: inline-block;
+      padding: 0.4rem 1.2rem;
+      border-radius: 999px;
+      background: rgba(99,102,241,0.15);
+      border: 1px solid rgba(99,102,241,0.4);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .cover h1 {
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, #818cf8, #c084fc, #fb7185);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+
+    .cover .subtitle {
+      font-size: 1.1rem;
+      color: var(--muted);
+      margin-bottom: 3rem;
+      position: relative;
+    }
+
+    .cover-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      max-width: 700px;
+      width: 100%;
+      position: relative;
+    }
+
+    .cover-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-align: left;
+      backdrop-filter: blur(10px);
+    }
+
+    .cover-card .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); font-weight: 600; margin-bottom: 0.4rem; }
+    .cover-card .value { font-size: 14px; color: var(--text); font-weight: 500; }
+
+    /* ── Sections ─────────────────────────────────────────── */
+    section { margin-bottom: 4rem; scroll-margin-top: 2rem; }
+
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--indigo);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 0.75rem;
+      line-height: 1.25;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #c7d2fe;
+      margin: 2rem 0 0.75rem;
+    }
+
+    h4 { font-size: 1rem; font-weight: 600; color: var(--accent); margin: 1.5rem 0 0.5rem; }
+
+    p { color: var(--muted); margin-bottom: 1rem; }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--indigo), transparent);
+      opacity: 0.3;
+      margin: 0.75rem 0 2rem;
+    }
+
+    /* ── Cards / Boxes ────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .stat-card .icon { font-size: 1.6rem; margin-bottom: 0.3rem; }
+    .stat-card .num  { font-size: 2rem; font-weight: 800; color: white; }
+    .stat-card .lbl  { font-size: 12px; color: var(--muted); }
+
+    /* ── Table ────────────────────────────────────────────── */
+    .tbl-wrap { overflow-x: auto; margin-bottom: 1.5rem; border-radius: 14px; border: 1px solid var(--border); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    thead tr { background: rgba(99,102,241,0.12); }
+    th { text-align: left; padding: 0.9rem 1.25rem; color: var(--accent); font-weight: 600; font-size: 12px; letter-spacing: 0.04em; }
+    td { padding: 0.85rem 1.25rem; color: var(--muted); border-top: 1px solid var(--border); }
+    tr:hover td { background: rgba(255,255,255,0.03); color: var(--text); }
+
+    /* ── Code blocks ──────────────────────────────────────── */
+    pre, code {
+      font-family: 'Fira Code', 'Courier New', monospace;
+      font-size: 13px;
+    }
+
+    pre {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(99,102,241,0.2);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      overflow-x: auto;
+      color: #a5f3fc;
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+
+    .kw  { color: #c084fc; }
+    .fn  { color: #818cf8; }
+    .str { color: #4ade80; }
+    .cm  { color: #475569; font-style: italic; }
+    .num { color: #fbbf24; }
+
+    /* ── ER Diagram ───────────────────────────────────────── */
+    .er-wrap {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(99,102,241,0.25);
+      border-radius: 18px;
+      padding: 2rem;
+      overflow: auto;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── Badges ───────────────────────────────────────────── */
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-indigo { background: rgba(99,102,241,0.2); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.3); }
+    .badge-green  { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+    .badge-yellow { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+    .badge-pink   { background: rgba(244,114,182,0.15); color: #f472b6; border: 1px solid rgba(244,114,182,0.3); }
+
+    /* ── Normalization boxes ──────────────────────────────── */
+    .nf-box {
+      border-left: 3px solid var(--indigo);
+      background: rgba(99,102,241,0.07);
+      border-radius: 0 12px 12px 0;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .nf-box.green  { border-color: var(--green);  background: rgba(74,222,128,0.07); }
+    .nf-box.yellow { border-color: var(--yellow); background: rgba(251,191,36,0.07); }
+    .nf-box.pink   { border-color: var(--pink);   background: rgba(244,114,182,0.07); }
+
+    .nf-title { font-weight: 700; color: white; margin-bottom: 0.35rem; font-size: 14px; }
+    .nf-body  { color: var(--muted); font-size: 13.5px; }
+
+    /* ── Lists ────────────────────────────────────────────── */
+    ul, ol { padding-left: 1.5rem; color: var(--muted); margin-bottom: 1rem; }
+    li { margin-bottom: 0.4rem; }
+    li strong { color: var(--text); }
+
+    /* ── Info callout ─────────────────────────────────────── */
+    .callout {
+      background: rgba(99,102,241,0.1);
+      border: 1px solid rgba(99,102,241,0.25);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      font-size: 13.5px;
+      color: #a5b4fc;
+    }
+
+    /* ── Print ────────────────────────────────────────────── */
+    @media print {
+      body { background: white; color: #1e293b; font-size: 12pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .toc { display: none; }
+      .content { padding: 1cm 2cm; }
+      .cover { page-break-after: always; min-height: auto; padding: 4cm 2cm; background: #1e1b4b !important; }
+      section { page-break-inside: avoid; }
+      pre { background: #f8fafc; color: #334155; border: 1px solid #e2e8f0; }
+    }
+
+    @media (max-width: 768px) {
+      .toc { display: none; }
+      .content { padding: 2rem 1.25rem 4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════ COVER PAGE ══════════════════ -->
+<div class="cover" id="cover">
+  <div class="cover-badge">📚 DBMS Final Project Report</div>
+  <h1>Alumni Portal</h1>
+  <p class="subtitle">A Full-Stack Database-Driven Web Application<br>for Alumni Network Management</p>
+
+  <div class="cover-grid">
+    <div class="cover-card">
+      <div class="label">Subject</div>
+      <div class="value">Database Management Systems</div>
+    </div>
+    <div class="cover-card">
+      <div class="label">Technology Stack</div>
+      <div class="value">MySQL · Node.js · React</div>
+    </div>
+    <div class="cover-card">
+      <div class="label">Group Members</div>
+      <div class="value">
+        Member 1 · Member 2<br>
+        Member 3 · Member 4 · Member 5
+      </div>
+    </div>
+    <div class="cover-card">
+      <div class="label">Submitted To</div>
+      <div class="value">Department of Computer Science</div>
+    </div>
+    <div class="cover-card">
+      <div class="label">Academic Year</div>
+      <div class="value">2025 – 2026</div>
+    </div>
+    <div class="cover-card">
+      <div class="label">Date</div>
+      <div class="value">April 2026</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ MAIN LAYOUT ══════════════════ -->
+<div class="layout">
+
+  <!-- ── Sidebar TOC ── -->
+  <nav class="toc">
+    <h3>Contents</h3>
+    <a href="#abstract">Abstract</a>
+    <a href="#intro">1. Introduction</a>
+    <a href="#aim">2. Aim &amp; Objectives</a>
+    <a href="#requirement">3. Requirement Analysis</a>
+    <a class="toc-sub" href="#entities">— Entities &amp; Relationships</a>
+    <a class="toc-sub" href="#functional">— Functional Requirements</a>
+    <a href="#erdiagram">4. ER Diagram</a>
+    <a href="#schema">5. Database Schema</a>
+    <a href="#normalization">6. Normalization</a>
+    <a href="#sql">7. SQL Queries</a>
+    <a class="toc-sub" href="#ddl">— DDL</a>
+    <a class="toc-sub" href="#dml">— DML</a>
+    <a class="toc-sub" href="#dql">— DQL / SELECT</a>
+    <a class="toc-sub" href="#view">— View &amp; Trigger</a>
+    <a href="#implementation">8. Implementation</a>
+    <a class="toc-sub" href="#backend">— Backend</a>
+    <a class="toc-sub" href="#frontend">— Frontend</a>
+    <a href="#testing">9. Testing</a>
+    <a href="#screenshots">10. Screenshots</a>
+    <a href="#conclusion">11. Conclusion</a>
+    <a href="#future">12. Future Work</a>
+  </nav>
+
+  <!-- ── Main Content ── -->
+  <main class="content">
+
+    <!-- ── ABSTRACT ── -->
+    <section id="abstract">
+      <div class="section-label">Preface</div>
+      <h2>Abstract</h2>
+      <div class="divider"></div>
+      <p>
+        The <strong style="color:white">Alumni Portal</strong> is a full-stack web application designed to help educational institutions maintain
+        a structured, searchable database of their graduates. Built on a MySQL relational database backend
+        and a React.js frontend, the system enables alumni registration, profile management, peer messaging,
+        referral requests, and administrator-controlled data maintenance.
+      </p>
+      <p>
+        The project demonstrates core DBMS concepts including Entity–Relationship modelling, schema design,
+        normalization to 3NF, DDL/DML/DQL operations, aggregate functions, multi-table JOINs, views, and
+        triggers — all integrated into a production-style REST API served by Node.js and Express.
+      </p>
+      <p>
+        An embedded <em>Analytics</em> dashboard surfaces live SQL query results — company-wise distribution,
+        graduation-year histograms, INNER JOIN and LEFT JOIN result sets — directly in the browser, satisfying
+        the testing and output requirements of the project specification.
+      </p>
+    </section>
+
+    <!-- ── INTRODUCTION ── -->
+    <section id="intro">
+      <div class="section-label">Section 01</div>
+      <h2>Introduction</h2>
+      <div class="divider"></div>
+      <p>
+        Educational institutions maintain thousands of alumni records that are often stored in isolated
+        spreadsheets, email threads, or outdated paper registers. This makes it difficult to search,
+        contact, or analyse graduate data. A centralised, database-driven portal solves these problems
+        by offering structured storage, real-time search, and role-based access control.
+      </p>
+      <p>
+        The Alumni Portal addresses this gap. It provides a <strong style="color:white">student-facing interface</strong>
+        for browsing alumni profiles and sending peer messages, and an
+        <strong style="color:white">admin-facing interface</strong> for adding, editing, and deleting records.
+        All data mutations are automatically recorded in an audit log via a MySQL TRIGGER,
+        and a VIEW surfaces a denormalised summary of alumni for quick reporting.
+      </p>
+      <p>
+        This report maps every stage of the project — from problem definition and ER modelling through
+        SQL implementation and frontend integration — to the professor's 11-step checklist.
+      </p>
+    </section>
+
+    <!-- ── AIM & OBJECTIVES ── -->
+    <section id="aim">
+      <div class="section-label">Section 02</div>
+      <h2>Aim &amp; Objectives</h2>
+      <div class="divider"></div>
+
+      <h3>Aim</h3>
+      <p>
+        To design and implement a fully-functional Alumni Portal that demonstrates end-to-end
+        database application development: from ER design and normalised schema to a React frontend
+        backed by a Node.js REST API connected to a MySQL database.
+      </p>
+
+      <h3>Objectives</h3>
+      <ul>
+        <li>Model the problem domain using an Entity–Relationship diagram.</li>
+        <li>Convert the ER model into normalised relational tables (up to 3NF / BCNF).</li>
+        <li>Implement the schema using DDL statements (CREATE TABLE, CREATE VIEW, CREATE TRIGGER).</li>
+        <li>Populate the database with realistic seed data using DML (INSERT, UPDATE, DELETE).</li>
+        <li>Write SELECT queries covering filtering, grouping, aggregation, and multi-table JOINs.</li>
+        <li>Expose all database operations via a RESTful API (Node.js + Express + mysql2).</li>
+        <li>Build a responsive React UI with forms for registration, login, and alumni management.</li>
+        <li>Implement role-based access control (admin vs user) enforced on both frontend and backend.</li>
+        <li>Implement peer messaging and referral request functionality.</li>
+        <li>Surface live SQL analytics (aggregates, JOINs) on an Analytics dashboard tab.</li>
+      </ul>
+    </section>
+
+    <!-- ── REQUIREMENT ANALYSIS ── -->
+    <section id="requirement">
+      <div class="section-label">Section 03</div>
+      <h2>Requirement Analysis</h2>
+      <div class="divider"></div>
+
+      <h3 id="entities">Entities &amp; Relationships</h3>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Entity</th>
+              <th>Attributes</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color:white">User</strong></td>
+              <td>id, name, email, password, role, created_at</td>
+              <td>Registered portal users — students or admins</td>
+            </tr>
+            <tr>
+              <td><strong style="color:white">Alumni</strong></td>
+              <td>id, name, email, year, company</td>
+              <td>Graduate records — main data entity</td>
+            </tr>
+            <tr>
+              <td><strong style="color:white">Message</strong></td>
+              <td>id, sender, receiver, message, is_referral, sent_at</td>
+              <td>Peer-to-peer messages between users</td>
+            </tr>
+            <tr>
+              <td><strong style="color:white">AuditLog</strong></td>
+              <td>log_id, alumni_id, alumni_name, action, logged_at</td>
+              <td>Auto-generated audit trail from triggers</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Relationships</h4>
+      <ul>
+        <li><strong>User REGISTERS as</strong> a portal member (1:1 per account)</li>
+        <li><strong>Admin MANAGES</strong> Alumni (1:N — one admin can add/edit/delete many)</li>
+        <li><strong>User SENDS</strong> Messages to another User (M:N via messages table)</li>
+        <li><strong>INSERT/DELETE on Alumni triggers</strong> AuditLog entries (1:N)</li>
+      </ul>
+
+      <h3 id="functional">Functional Requirements</h3>
+      <div class="card-grid">
+        <div class="card">
+          <h4 style="margin-top:0">Authentication</h4>
+          <ul style="padding-left:1rem">
+            <li>User registration with duplicate check</li>
+            <li>Login with name + email + password</li>
+            <li>Admin promotion via secret code</li>
+            <li>Session stored in localStorage</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4 style="margin-top:0">Alumni Management</h4>
+          <ul style="padding-left:1rem">
+            <li>Add alumni records (admin only)</li>
+            <li>Edit any alumni field (admin only)</li>
+            <li>Delete alumni (admin only)</li>
+            <li>Search / filter alumni list</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4 style="margin-top:0">Messaging</h4>
+          <ul style="padding-left:1rem">
+            <li>Send message to any user</li>
+            <li>Mark message as referral request</li>
+            <li>View full conversation thread</li>
+            <li>Inbox with contact list</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4 style="margin-top:0">Analytics</h4>
+          <ul style="padding-left:1rem">
+            <li>Alumni count per company</li>
+            <li>Alumni count per graduation year</li>
+            <li>JOIN query results with audit log</li>
+            <li>Aggregate: MAX / MIN / AVG year</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ER DIAGRAM ── -->
+    <section id="erdiagram">
+      <div class="section-label">Section 04</div>
+      <h2>ER Diagram</h2>
+      <div class="divider"></div>
+      <p>The following ER diagram shows the four entities and their relationships in the Alumni Portal database.</p>
+
+      <div class="er-wrap">
+        <svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:'Inter',sans-serif;">
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#6366f1"/>
+            </marker>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+              <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+
+          <!-- Background grid -->
+          <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+            <path d="M 30 0 L 0 0 0 30" fill="none" stroke="rgba(99,102,241,0.06)" stroke-width="1"/>
+          </pattern>
+          <rect width="900" height="600" fill="url(#grid)"/>
+
+          <!-- ── ENTITY: users (top-left) ── -->
+          <rect x="30" y="60" width="200" height="230" rx="14" fill="rgba(99,102,241,0.15)" stroke="#6366f1" stroke-width="1.5"/>
+          <rect x="30" y="60" width="200" height="44" rx="14" fill="rgba(99,102,241,0.4)"/>
+          <rect x="30" y="90" width="200" height="14" rx="0" fill="rgba(99,102,241,0.4)"/>
+          <text x="130" y="87" text-anchor="middle" fill="white" font-weight="700" font-size="14">users</text>
+          <line x1="30" x2="230" y1="104" y2="104" stroke="#6366f1" stroke-width="1"/>
+          <!-- PK -->
+          <text x="48" y="124" fill="#fbbf24" font-size="11" font-weight="600">PK</text>
+          <text x="72" y="124" fill="#e2e8f0" font-size="12">id  INT  AI</text>
+          <text x="48" y="144" fill="#94a3b8" font-size="12">    name  VARCHAR(255)</text>
+          <text x="48" y="164" fill="#94a3b8" font-size="12">    email  VARCHAR(255)  UQ</text>
+          <text x="48" y="184" fill="#94a3b8" font-size="12">    password  VARCHAR(255)</text>
+          <text x="48" y="204" fill="#94a3b8" font-size="12">    role  ENUM</text>
+          <text x="48" y="224" fill="#94a3b8" font-size="12">    created_at  TIMESTAMP</text>
+
+          <!-- ── ENTITY: alumni (top-right) ── -->
+          <rect x="670" y="60" width="200" height="210" rx="14" fill="rgba(139,92,246,0.15)" stroke="#8b5cf6" stroke-width="1.5"/>
+          <rect x="670" y="60" width="200" height="44" rx="14" fill="rgba(139,92,246,0.4)"/>
+          <rect x="670" y="90" width="200" height="14" rx="0" fill="rgba(139,92,246,0.4)"/>
+          <text x="770" y="87" text-anchor="middle" fill="white" font-weight="700" font-size="14">alumni</text>
+          <line x1="670" x2="870" y1="104" y2="104" stroke="#8b5cf6" stroke-width="1"/>
+          <text x="688" y="124" fill="#fbbf24" font-size="11" font-weight="600">PK</text>
+          <text x="712" y="124" fill="#e2e8f0" font-size="12">id  INT  AI</text>
+          <text x="688" y="144" fill="#94a3b8" font-size="12">    name  VARCHAR(255)</text>
+          <text x="688" y="164" fill="#94a3b8" font-size="12">    email  VARCHAR(255)  UQ</text>
+          <text x="688" y="184" fill="#94a3b8" font-size="12">    year  INT</text>
+          <text x="688" y="204" fill="#94a3b8" font-size="12">    company  VARCHAR(255)</text>
+
+          <!-- ── ENTITY: messages (bottom-left) ── -->
+          <rect x="30" y="380" width="210" height="190" rx="14" fill="rgba(34,211,238,0.1)" stroke="#22d3ee" stroke-width="1.5"/>
+          <rect x="30" y="380" width="210" height="44" rx="14" fill="rgba(34,211,238,0.3)"/>
+          <rect x="30" y="410" width="210" height="14" rx="0" fill="rgba(34,211,238,0.3)"/>
+          <text x="135" y="407" text-anchor="middle" fill="white" font-weight="700" font-size="14">messages</text>
+          <line x1="30" x2="240" y1="424" y2="424" stroke="#22d3ee" stroke-width="1"/>
+          <text x="48" y="444" fill="#fbbf24" font-size="11" font-weight="600">PK</text>
+          <text x="72" y="444" fill="#e2e8f0" font-size="12">id  INT  AI</text>
+          <text x="48" y="464" fill="#94a3b8" font-size="12">    sender  VARCHAR(255)</text>
+          <text x="48" y="484" fill="#94a3b8" font-size="12">    receiver  VARCHAR(255)</text>
+          <text x="48" y="504" fill="#94a3b8" font-size="12">    message  TEXT</text>
+          <text x="48" y="524" fill="#94a3b8" font-size="12">    is_referral  BOOL</text>
+          <text x="48" y="544" fill="#94a3b8" font-size="12">    sent_at  TIMESTAMP</text>
+
+          <!-- ── ENTITY: alumni_audit_log (bottom-right) ── -->
+          <rect x="660" y="380" width="220" height="190" rx="14" fill="rgba(251,191,36,0.1)" stroke="#fbbf24" stroke-width="1.5"/>
+          <rect x="660" y="380" width="220" height="44" rx="14" fill="rgba(251,191,36,0.25)"/>
+          <rect x="660" y="410" width="220" height="14" rx="0" fill="rgba(251,191,36,0.25)"/>
+          <text x="770" y="407" text-anchor="middle" fill="white" font-weight="700" font-size="14">alumni_audit_log</text>
+          <line x1="660" x2="880" y1="424" y2="424" stroke="#fbbf24" stroke-width="1"/>
+          <text x="678" y="444" fill="#fbbf24" font-size="11" font-weight="600">PK</text>
+          <text x="702" y="444" fill="#e2e8f0" font-size="12">log_id  INT  AI</text>
+          <text x="678" y="464" fill="#94a3b8" font-size="12">FK  alumni_id  INT</text>
+          <text x="678" y="484" fill="#94a3b8" font-size="12">    alumni_name  VARCHAR(255)</text>
+          <text x="678" y="504" fill="#94a3b8" font-size="12">    action  VARCHAR(50)</text>
+          <text x="678" y="524" fill="#94a3b8" font-size="12">    logged_at  TIMESTAMP</text>
+
+          <!-- ── RELATIONSHIP DIAMONDS ── -->
+          <!-- MANAGES (admin–alumni) -->
+          <polygon points="450,140 510,175 450,210 390,175" fill="rgba(99,102,241,0.2)" stroke="#6366f1" stroke-width="1.5"/>
+          <text x="450" y="180" text-anchor="middle" fill="#a5b4fc" font-size="12" font-weight="600">MANAGES</text>
+
+          <!-- SENDS (user–messages) -->
+          <polygon points="230,480 290,510 230,540 170,510" fill="rgba(34,211,238,0.15)" stroke="#22d3ee" stroke-width="1.5"/>
+          <text x="230" y="515" text-anchor="middle" fill="#67e8f9" font-size="11" font-weight="600">SENDS</text>
+
+          <!-- TRIGGERS (alumni–audit) -->
+          <polygon points="770,280 830,315 770,350 710,315" fill="rgba(251,191,36,0.15)" stroke="#fbbf24" stroke-width="1.5"/>
+          <text x="770" y="320" text-anchor="middle" fill="#fde68a" font-size="11" font-weight="600">TRIGGERS</text>
+
+          <!-- ── RELATIONSHIP LINES ── -->
+          <!-- users → MANAGES -->
+          <line x1="230" y1="175" x2="390" y2="175" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow)"/>
+          <!-- MANAGES → alumni -->
+          <line x1="510" y1="175" x2="670" y2="175" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow)"/>
+          <!-- users → SENDS -->
+          <line x1="130" y1="290" x2="130" y2="480" stroke="#22d3ee" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow)"/>
+          <!-- SENDS → messages (already in same box area, arrow from diamond to table) -->
+          <line x1="290" y1="510" x2="240" y2="510" stroke="#22d3ee" stroke-width="1.5" stroke-dasharray="6,3"/>
+          <!-- alumni → TRIGGERS -->
+          <line x1="770" y1="270" x2="770" y2="280" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow)"/>
+          <!-- TRIGGERS → audit_log -->
+          <line x1="770" y1="350" x2="770" y2="380" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow)"/>
+
+          <!-- Cardinality labels -->
+          <text x="300" y="168" fill="#818cf8" font-size="11">1</text>
+          <text x="650" y="168" fill="#818cf8" font-size="11">N</text>
+          <text x="140" y="350" fill="#67e8f9" font-size="11">N</text>
+          <text x="760" y="370" fill="#fde68a" font-size="11">1:N</text>
+
+          <!-- Legend -->
+          <rect x="320" y="380" width="320" height="120" rx="12" fill="rgba(0,0,0,0.3)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+          <text x="340" y="402" fill="#94a3b8" font-size="11" font-weight="600">LEGEND</text>
+          <rect x="340" y="412" width="14" height="14" rx="3" fill="rgba(99,102,241,0.4)" stroke="#6366f1"/>
+          <text x="362" y="423" fill="#a5b4fc" font-size="11">users table</text>
+          <rect x="340" y="432" width="14" height="14" rx="3" fill="rgba(139,92,246,0.4)" stroke="#8b5cf6"/>
+          <text x="362" y="443" fill="#c4b5fd" font-size="11">alumni table</text>
+          <rect x="340" y="452" width="14" height="14" rx="3" fill="rgba(34,211,238,0.3)" stroke="#22d3ee"/>
+          <text x="362" y="463" fill="#67e8f9" font-size="11">messages table</text>
+          <rect x="340" y="472" width="14" height="14" rx="3" fill="rgba(251,191,36,0.25)" stroke="#fbbf24"/>
+          <text x="362" y="483" fill="#fde68a" font-size="11">alumni_audit_log table</text>
+          <line x1="470" y1="419" x2="510" y2="419" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <text x="518" y="423" fill="#94a3b8" font-size="11">Relationship</text>
+          <text x="470" y="443" fill="#fbbf24" font-size="11">PK = Primary Key</text>
+          <text x="470" y="463" fill="#94a3b8" font-size="11">FK = Foreign Key</text>
+          <text x="470" y="483" fill="#94a3b8" font-size="11">UQ = Unique</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ── DATABASE SCHEMA ── -->
+    <section id="schema">
+      <div class="section-label">Section 05</div>
+      <h2>Database Schema</h2>
+      <div class="divider"></div>
+
+      <h3>Table: users</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>id</td><td>INT</td><td>PRIMARY KEY, AUTO_INCREMENT</td><td>Surrogate primary key</td></tr>
+            <tr><td>name</td><td>VARCHAR(255)</td><td>NOT NULL</td><td>Full name of the user</td></tr>
+            <tr><td>email</td><td>VARCHAR(255)</td><td>NOT NULL, UNIQUE</td><td>Login email address</td></tr>
+            <tr><td>password</td><td>VARCHAR(255)</td><td>NOT NULL</td><td>Plain-text password (demo)</td></tr>
+            <tr><td>role</td><td>ENUM('user','admin')</td><td>DEFAULT 'user'</td><td>Access control level</td></tr>
+            <tr><td>created_at</td><td>TIMESTAMP</td><td>DEFAULT CURRENT_TIMESTAMP</td><td>Registration timestamp</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Table: alumni</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>id</td><td>INT</td><td>PRIMARY KEY, AUTO_INCREMENT</td><td>Surrogate primary key</td></tr>
+            <tr><td>name</td><td>VARCHAR(255)</td><td>NOT NULL</td><td>Alumnus full name</td></tr>
+            <tr><td>email</td><td>VARCHAR(255)</td><td>NOT NULL, UNIQUE</td><td>Contact email</td></tr>
+            <tr><td>year</td><td>INT</td><td>NOT NULL</td><td>Graduation year</td></tr>
+            <tr><td>company</td><td>VARCHAR(255)</td><td>NOT NULL</td><td>Current employer</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Table: alumni_audit_log</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>log_id</td><td>INT</td><td>PRIMARY KEY, AUTO_INCREMENT</td><td>Audit entry ID</td></tr>
+            <tr><td>alumni_id</td><td>INT</td><td>—</td><td>Reference to alumni.id</td></tr>
+            <tr><td>alumni_name</td><td>VARCHAR(255)</td><td>—</td><td>Snapshot of name at event time</td></tr>
+            <tr><td>action</td><td>VARCHAR(50)</td><td>—</td><td>'INSERT' or 'DELETE'</td></tr>
+            <tr><td>logged_at</td><td>TIMESTAMP</td><td>DEFAULT CURRENT_TIMESTAMP</td><td>Time of the event</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Table: messages</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>id</td><td>INT</td><td>PRIMARY KEY, AUTO_INCREMENT</td><td>Message ID</td></tr>
+            <tr><td>sender</td><td>VARCHAR(255)</td><td>NOT NULL</td><td>Sender's name</td></tr>
+            <tr><td>receiver</td><td>VARCHAR(255)</td><td>NOT NULL</td><td>Receiver's name</td></tr>
+            <tr><td>message</td><td>TEXT</td><td>NOT NULL</td><td>Message content</td></tr>
+            <tr><td>is_referral</td><td>BOOLEAN</td><td>DEFAULT FALSE</td><td>TRUE if referral request</td></tr>
+            <tr><td>sent_at</td><td>TIMESTAMP</td><td>DEFAULT CURRENT_TIMESTAMP</td><td>Send timestamp</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>View: alumni_summary</h3>
+      <pre><span class="kw">CREATE OR REPLACE VIEW</span> alumni_summary <span class="kw">AS</span>
+<span class="kw">SELECT</span>
+  id, name, email,
+  year   <span class="kw">AS</span> graduation_year,
+  company,
+  <span class="fn">CONCAT</span>(<span class="str">'Class of '</span>, year, <span class="str">' | '</span>, company) <span class="kw">AS</span> summary
+<span class="kw">FROM</span> alumni
+<span class="kw">ORDER BY</span> year <span class="kw">DESC</span>;</pre>
+    </section>
+
+    <!-- ── NORMALIZATION ── -->
+    <section id="normalization">
+      <div class="section-label">Section 06</div>
+      <h2>Normalization (up to 3NF)</h2>
+      <div class="divider"></div>
+      <p>Each table in the schema has been analysed and verified to satisfy 1NF, 2NF, and 3NF (and BCNF).</p>
+
+      <div class="nf-box">
+        <div class="nf-title">1NF — First Normal Form ✔</div>
+        <div class="nf-body">
+          <strong>Rule:</strong> All column values are atomic; no repeating groups; every row has a unique primary key.<br><br>
+          <strong>Satisfied because:</strong> Every column stores a single, indivisible value (e.g., <code>year</code> is a single integer, <code>company</code> is a single string).
+          No column holds a list or array. Each row is identified uniquely by its auto-increment <code>id</code> (or <code>log_id</code>).
+        </div>
+      </div>
+
+      <div class="nf-box green">
+        <div class="nf-title">2NF — Second Normal Form ✔</div>
+        <div class="nf-body">
+          <strong>Rule:</strong> Already in 1NF and all non-key attributes are <em>fully functionally dependent</em> on the entire primary key (no partial dependencies).<br><br>
+          <strong>Satisfied because:</strong> Every table uses a single-column surrogate primary key (<code>id INT AUTO_INCREMENT</code>).
+          A partial dependency can only arise when the PK is composite — since our PKs are all single-column, partial dependencies are structurally impossible. Therefore 2NF is automatically satisfied.
+        </div>
+      </div>
+
+      <div class="nf-box yellow">
+        <div class="nf-title">3NF — Third Normal Form ✔</div>
+        <div class="nf-body">
+          <strong>Rule:</strong> Already in 2NF and there are no <em>transitive dependencies</em> (no non-key column determines another non-key column).<br><br>
+          <strong>Example check — alumni table:</strong>
+          <ul style="margin-top:0.5rem;color:#94a3b8">
+            <li><code>id → name</code>, <code>id → email</code>, <code>id → year</code>, <code>id → company</code> ✔</li>
+            <li><code>company</code> does <em>not</em> determine <code>year</code>, and <code>year</code> does <em>not</em> determine <code>company</code>.</li>
+            <li>No non-key attribute determines any other non-key attribute → <strong>no transitive dependency → 3NF satisfied</strong>.</li>
+          </ul>
+          <strong>Example check — messages table:</strong>
+          <ul style="margin-top:0.5rem;color:#94a3b8">
+            <li><code>sender</code> does not determine <code>receiver</code> or <code>message</code>.</li>
+            <li>All attributes depend only on the primary key <code>id</code> → 3NF satisfied.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="nf-box pink">
+        <div class="nf-title">BCNF — Boyce–Codd Normal Form ✔</div>
+        <div class="nf-body">
+          <strong>Rule:</strong> For every non-trivial functional dependency X → Y, X must be a superkey.<br><br>
+          <strong>Satisfied because:</strong> The only determinant in every table is the primary key column.
+          There are no candidate keys other than <code>id</code> (except <code>email UNIQUE</code> — but email → other columns means email is itself a superkey, which is valid in BCNF).
+        </div>
+      </div>
+
+      <h3>Normalization Summary Table</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Table</th><th>1NF</th><th>2NF</th><th>3NF</th><th>BCNF</th></tr></thead>
+          <tbody>
+            <tr><td>users</td><td><span class="badge badge-green">✔ Yes</span></td><td><span class="badge badge-green">✔ Yes</span></td><td><span class="badge badge-green">✔ Yes</span></td><td><span class="badge badge-green">✔ Yes</span></td></tr>
+            <tr><td>alumni</td><td><span class="badge badge-green">✔ Yes</span></td><td><span class="badge badge-green">✔ Yes</span></td><td><span class="badge badge-green">✔ Yes</span></td><td><span class="badge badge-green">✔ Yes</span></td></tr>
+            <tr><td>alumni_audit_log</td><td><span class="badge badge-green">✔ Yes</span></td><td><span class="badge badge-green">✔ Yes</span></td><td><span class="badge badge-green">✔ Yes</span></td><td><span class="badge badge-green">✔ Yes</span></td></tr>
+            <tr><td>messages</td><td><span class="badge badge-green">✔ Yes</span></td><td><span class="badge badge-green">✔ Yes</span></td><td><span class="badge badge-green">✔ Yes</span></td><td><span class="badge badge-green">✔ Yes</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── SQL QUERIES ── -->
+    <section id="sql">
+      <div class="section-label">Section 07</div>
+      <h2>SQL Queries</h2>
+      <div class="divider"></div>
+
+      <h3 id="ddl">DDL — Data Definition Language</h3>
+
+      <h4>CREATE TABLE users</h4>
+      <pre><span class="kw">CREATE TABLE IF NOT EXISTS</span> users (
+  id         <span class="kw">INT AUTO_INCREMENT PRIMARY KEY</span>,
+  name       <span class="kw">VARCHAR</span>(<span class="num">255</span>) <span class="kw">NOT NULL</span>,
+  email      <span class="kw">VARCHAR</span>(<span class="num">255</span>) <span class="kw">NOT NULL UNIQUE</span>,
+  password   <span class="kw">VARCHAR</span>(<span class="num">255</span>) <span class="kw">NOT NULL</span>,
+  role       <span class="kw">ENUM</span>(<span class="str">'user'</span>,<span class="str">'admin'</span>) <span class="kw">DEFAULT</span> <span class="str">'user'</span>,
+  created_at <span class="kw">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>
+);</pre>
+
+      <h4>CREATE TABLE alumni</h4>
+      <pre><span class="kw">CREATE TABLE IF NOT EXISTS</span> alumni (
+  id      <span class="kw">INT AUTO_INCREMENT PRIMARY KEY</span>,
+  name    <span class="kw">VARCHAR</span>(<span class="num">255</span>) <span class="kw">NOT NULL</span>,
+  email   <span class="kw">VARCHAR</span>(<span class="num">255</span>) <span class="kw">NOT NULL UNIQUE</span>,
+  year    <span class="kw">INT NOT NULL</span>,
+  company <span class="kw">VARCHAR</span>(<span class="num">255</span>) <span class="kw">NOT NULL</span>
+);</pre>
+
+      <h4>CREATE TABLE alumni_audit_log</h4>
+      <pre><span class="kw">CREATE TABLE IF NOT EXISTS</span> alumni_audit_log (
+  log_id      <span class="kw">INT AUTO_INCREMENT PRIMARY KEY</span>,
+  alumni_id   <span class="kw">INT</span>,
+  alumni_name <span class="kw">VARCHAR</span>(<span class="num">255</span>),
+  action      <span class="kw">VARCHAR</span>(<span class="num">50</span>),
+  logged_at   <span class="kw">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>
+);</pre>
+
+      <h4>CREATE TABLE messages</h4>
+      <pre><span class="kw">CREATE TABLE IF NOT EXISTS</span> messages (
+  id          <span class="kw">INT AUTO_INCREMENT PRIMARY KEY</span>,
+  sender      <span class="kw">VARCHAR</span>(<span class="num">255</span>) <span class="kw">NOT NULL</span>,
+  receiver    <span class="kw">VARCHAR</span>(<span class="num">255</span>) <span class="kw">NOT NULL</span>,
+  message     <span class="kw">TEXT NOT NULL</span>,
+  is_referral <span class="kw">BOOLEAN DEFAULT FALSE</span>,
+  sent_at     <span class="kw">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>
+);</pre>
+
+      <h3 id="dml">DML — Data Manipulation Language</h3>
+
+      <h4>INSERT — Seed alumni records</h4>
+      <pre><span class="kw">INSERT IGNORE INTO</span> alumni (name, email, year, company) <span class="kw">VALUES</span>
+  (<span class="str">'Priya Sharma'</span>,  <span class="str">'priya@example.com'</span>,  <span class="num">2021</span>, <span class="str">'Google'</span>),
+  (<span class="str">'Arjun Mehta'</span>,   <span class="str">'arjun@example.com'</span>,  <span class="num">2020</span>, <span class="str">'Microsoft'</span>),
+  (<span class="str">'Sneha Reddy'</span>,   <span class="str">'sneha@example.com'</span>,  <span class="num">2022</span>, <span class="str">'Amazon'</span>),
+  (<span class="str">'Rahul Gupta'</span>,   <span class="str">'rahul@example.com'</span>,  <span class="num">2019</span>, <span class="str">'Infosys'</span>),
+  (<span class="str">'Anjali Singh'</span>,  <span class="str">'anjali@example.com'</span>, <span class="num">2023</span>, <span class="str">'Wipro'</span>);</pre>
+
+      <h4>UPDATE — Change employer</h4>
+      <pre><span class="kw">UPDATE</span> alumni
+<span class="kw">SET</span> company = <span class="str">'Meta'</span>
+<span class="kw">WHERE</span> name = <span class="str">'Priya Sharma'</span>;</pre>
+
+      <h4>DELETE — Remove a record</h4>
+      <pre><span class="kw">DELETE FROM</span> alumni
+<span class="kw">WHERE</span> email = <span class="str">'test@example.com'</span>;</pre>
+
+      <h3 id="dql">DQL — SELECT Queries &amp; Aggregates</h3>
+
+      <h4>Basic SELECT — All alumni</h4>
+      <pre><span class="kw">SELECT</span> * <span class="kw">FROM</span> alumni <span class="kw">ORDER BY</span> id <span class="kw">DESC</span>;</pre>
+
+      <h4>WHERE — Filter by company</h4>
+      <pre><span class="kw">SELECT</span> * <span class="kw">FROM</span> alumni <span class="kw">WHERE</span> company = <span class="str">'Google'</span>;</pre>
+
+      <h4>BETWEEN — Year range filter</h4>
+      <pre><span class="kw">SELECT</span> name, email, year, company
+<span class="kw">FROM</span> alumni
+<span class="kw">WHERE</span> year <span class="kw">BETWEEN</span> <span class="num">2019</span> <span class="kw">AND</span> <span class="num">2022</span>
+<span class="kw">ORDER BY</span> year <span class="kw">ASC</span>;</pre>
+
+      <h4>COUNT — Total alumni</h4>
+      <pre><span class="kw">SELECT COUNT</span>(*) <span class="kw">AS</span> total_alumni <span class="kw">FROM</span> alumni;</pre>
+
+      <h4>GROUP BY — Alumni per company</h4>
+      <pre><span class="kw">SELECT</span> company, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> total
+<span class="kw">FROM</span> alumni
+<span class="kw">GROUP BY</span> company
+<span class="kw">ORDER BY</span> total <span class="kw">DESC</span>;</pre>
+
+      <h4>GROUP BY — Alumni per graduation year</h4>
+      <pre><span class="kw">SELECT</span> year, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> graduates
+<span class="kw">FROM</span> alumni
+<span class="kw">GROUP BY</span> year
+<span class="kw">ORDER BY</span> year <span class="kw">DESC</span>;</pre>
+
+      <h4>Aggregate Functions — MAX / MIN / AVG</h4>
+      <pre><span class="kw">SELECT</span>
+  <span class="fn">MAX</span>(year) <span class="kw">AS</span> latest_batch,
+  <span class="fn">MIN</span>(year) <span class="kw">AS</span> earliest_batch,
+  <span class="fn">ROUND</span>(<span class="fn">AVG</span>(year), <span class="num">0</span>) <span class="kw">AS</span> avg_graduation_year
+<span class="kw">FROM</span> alumni;</pre>
+
+      <h4>HAVING — Companies with more than 1 alumnus</h4>
+      <pre><span class="kw">SELECT</span> company, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> cnt
+<span class="kw">FROM</span> alumni
+<span class="kw">GROUP BY</span> company
+<span class="kw">HAVING</span> cnt &gt; <span class="num">1</span>;</pre>
+
+      <h4>INNER JOIN — Alumni with audit log</h4>
+      <pre><span class="kw">SELECT</span>
+  a.name       <span class="kw">AS</span> alumni_name,
+  a.company,
+  a.year,
+  l.action,
+  l.logged_at
+<span class="kw">FROM</span> alumni a
+<span class="kw">INNER JOIN</span> alumni_audit_log l <span class="kw">ON</span> a.id = l.alumni_id
+<span class="kw">ORDER BY</span> l.logged_at <span class="kw">DESC</span>;</pre>
+
+      <h4>LEFT JOIN — All alumni (with or without audit entry)</h4>
+      <pre><span class="kw">SELECT</span>
+  a.name       <span class="kw">AS</span> alumni_name,
+  a.year,
+  a.company,
+  <span class="fn">COALESCE</span>(l.action, <span class="str">'No log'</span>) <span class="kw">AS</span> audit_action
+<span class="kw">FROM</span> alumni a
+<span class="kw">LEFT JOIN</span> alumni_audit_log l <span class="kw">ON</span> a.id = l.alumni_id
+<span class="kw">ORDER BY</span> a.year <span class="kw">DESC</span>;</pre>
+
+      <h4>Sub-query — Latest batch alumni</h4>
+      <pre><span class="kw">SELECT</span> * <span class="kw">FROM</span> alumni
+<span class="kw">WHERE</span> year = (<span class="kw">SELECT MAX</span>(year) <span class="kw">FROM</span> alumni);</pre>
+
+      <h3 id="view">View &amp; Triggers</h3>
+
+      <h4>VIEW — alumni_summary</h4>
+      <pre><span class="kw">CREATE OR REPLACE VIEW</span> alumni_summary <span class="kw">AS</span>
+<span class="kw">SELECT</span>
+  id, name, email,
+  year   <span class="kw">AS</span> graduation_year,
+  company,
+  <span class="fn">CONCAT</span>(<span class="str">'Class of '</span>, year, <span class="str">' | '</span>, company) <span class="kw">AS</span> summary
+<span class="kw">FROM</span> alumni
+<span class="kw">ORDER BY</span> year <span class="kw">DESC</span>;
+
+<span class="cm">-- Query the view:</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> alumni_summary;</pre>
+
+      <h4>TRIGGER 1 — Log every INSERT on alumni</h4>
+      <pre><span class="kw">CREATE TRIGGER</span> after_alumni_insert
+<span class="kw">AFTER INSERT ON</span> alumni
+<span class="kw">FOR EACH ROW</span>
+<span class="kw">BEGIN</span>
+  <span class="kw">INSERT INTO</span> alumni_audit_log (alumni_id, alumni_name, action)
+  <span class="kw">VALUES</span> (NEW.id, NEW.name, <span class="str">'INSERT'</span>);
+<span class="kw">END</span>;</pre>
+
+      <h4>TRIGGER 2 — Log every DELETE on alumni</h4>
+      <pre><span class="kw">CREATE TRIGGER</span> after_alumni_delete
+<span class="kw">AFTER DELETE ON</span> alumni
+<span class="kw">FOR EACH ROW</span>
+<span class="kw">BEGIN</span>
+  <span class="kw">INSERT INTO</span> alumni_audit_log (alumni_id, alumni_name, action)
+  <span class="kw">VALUES</span> (OLD.id, OLD.name, <span class="str">'DELETE'</span>);
+<span class="kw">END</span>;</pre>
+    </section>
+
+    <!-- ── IMPLEMENTATION ── -->
+    <section id="implementation">
+      <div class="section-label">Section 08</div>
+      <h2>Implementation</h2>
+      <div class="divider"></div>
+
+      <h3 id="backend">Backend — Node.js + Express + MySQL</h3>
+
+      <div class="card-grid">
+        <div class="card">
+          <h4 style="margin-top:0">Technology</h4>
+          <ul style="padding-left:1rem">
+            <li>Node.js v18+</li>
+            <li>Express.js framework</li>
+            <li>mysql2 driver</li>
+            <li>CORS middleware</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4 style="margin-top:0">API Endpoints</h4>
+          <ul style="padding-left:1rem">
+            <li><code>POST /register</code></li>
+            <li><code>POST /login</code></li>
+            <li><code>GET /alumni</code></li>
+            <li><code>POST /add-alumni</code></li>
+            <li><code>PUT /alumni/:id</code></li>
+            <li><code>DELETE /alumni/:id</code></li>
+            <li><code>GET /stats</code></li>
+            <li><code>GET /audit-log</code></li>
+            <li><code>POST /send-message</code></li>
+            <li><code>GET /messages/:user</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <h4>Sample Backend Code — /stats endpoint</h4>
+      <pre><span class="kw">app</span>.get(<span class="str">'/stats'</span>, (req, res) =&gt; {
+  <span class="cm">// Aggregate query: counts, avg, max, min</span>
+  <span class="kw">const</span> q1 = <span class="str">`SELECT COUNT(*) AS total_alumni,
+    (SELECT COUNT(*) FROM users) AS total_users,
+    ROUND(AVG(year),0) AS avg_year,
+    MAX(year) AS max_year,
+    MIN(year) AS min_year
+  FROM alumni`</span>;
+
+  <span class="cm">// GROUP BY company</span>
+  <span class="kw">const</span> q2 = <span class="str">`SELECT company, COUNT(*) AS total
+    FROM alumni GROUP BY company ORDER BY total DESC`</span>;
+
+  <span class="cm">// INNER JOIN with audit log</span>
+  <span class="kw">const</span> q4 = <span class="str">`SELECT a.name, a.company, l.action, l.logged_at
+    FROM alumni a
+    INNER JOIN alumni_audit_log l ON a.id = l.alumni_id`</span>;
+
+  <span class="cm">// ... nested callbacks return combined results</span>
+});</pre>
+
+      <h3 id="frontend">Frontend — React + Vite + Tailwind CSS</h3>
+
+      <div class="card-grid">
+        <div class="card">
+          <h4 style="margin-top:0">Pages / Components</h4>
+          <ul style="padding-left:1rem">
+            <li><strong>Login.jsx</strong> — Login form</li>
+            <li><strong>Register.jsx</strong> — Registration form</li>
+            <li><strong>Dashboard.jsx</strong> — Tab navigation shell</li>
+            <li><strong>AlumniList.jsx</strong> — Search + cards + edit modal</li>
+            <li><strong>AlumniForm.jsx</strong> — Add alumni form (admin)</li>
+            <li><strong>Messages.jsx</strong> — Inbox + chat thread</li>
+            <li><strong>Analytics.jsx</strong> — Live SQL stats dashboard</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4 style="margin-top:0">Features</h4>
+          <ul style="padding-left:1rem">
+            <li>Dark glassmorphism UI</li>
+            <li>Role-based tab visibility</li>
+            <li>Real-time search filter</li>
+            <li>Loading skeletons</li>
+            <li>Toast notifications</li>
+            <li>Responsive grid layout</li>
+            <li>CSS-only bar charts</li>
+            <li>Expandable SQL panels</li>
+          </ul>
+        </div>
+      </div>
+
+      <h4>Project Structure</h4>
+      <pre><span class="cm">DBMS FINAL PROJECT/</span>
+├── backend/
+│   ├── server.js        <span class="cm"># Express API + MySQL queries</span>
+│   ├── seed.js          <span class="cm"># Bulk insert 56 alumni records</span>
+│   └── package.json
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx            <span class="cm"># Router + toast config</span>
+│   │   ├── components/
+│   │   │   ├── Login.jsx
+│   │   │   ├── Register.jsx
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── AlumniList.jsx
+│   │   │   ├── AlumniForm.jsx
+│   │   │   ├── Messages.jsx
+│   │   │   └── Analytics.jsx  <span class="cm"># NEW — live SQL analytics</span>
+│   │   └── index.css
+│   └── package.json
+├── database/
+│   └── alumni_portal.sql      <span class="cm"># Full schema + queries</span>
+└── report/
+    └── index.html             <span class="cm"># This report</span></pre>
+
+      <h4>To Run the Project</h4>
+      <pre><span class="cm"># 1. Import database</span>
+mysql -u root -p &lt; database/alumni_portal.sql
+
+<span class="cm"># 2. Start backend (port 3000)</span>
+cd backend
+npm install
+node server.js
+
+<span class="cm"># 3. Start frontend (port 5173)</span>
+cd ../frontend
+npm install
+npm run dev
+
+<span class="cm"># 4. Optional: seed alumni data</span>
+cd ../backend
+node seed.js</pre>
+    </section>
+
+    <!-- ── TESTING ── -->
+    <section id="testing">
+      <div class="section-label">Section 09</div>
+      <h2>Testing</h2>
+      <div class="divider"></div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Test Case</th><th>Input</th><th>Expected Output</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>User Registration</td><td>Name, email, password</td><td>Account created, redirect to login</td><td><span class="badge badge-green">✔ Pass</span></td></tr>
+            <tr><td>2</td><td>Duplicate Registration</td><td>Same email twice</td><td>Error: "Name or email already registered"</td><td><span class="badge badge-green">✔ Pass</span></td></tr>
+            <tr><td>3</td><td>Admin Registration</td><td>Code "ADMIN2026"</td><td>Role = admin, 👑 badge shown</td><td><span class="badge badge-green">✔ Pass</span></td></tr>
+            <tr><td>4</td><td>Login Valid</td><td>Correct credentials</td><td>Redirect to dashboard</td><td><span class="badge badge-green">✔ Pass</span></td></tr>
+            <tr><td>5</td><td>Login Wrong Password</td><td>Wrong password</td><td>Error: "Wrong password"</td><td><span class="badge badge-green">✔ Pass</span></td></tr>
+            <tr><td>6</td><td>Add Alumni (admin)</td><td>Name, email, year, company</td><td>Card appears in alumni list</td><td><span class="badge badge-green">✔ Pass</span></td></tr>
+            <tr><td>7</td><td>Audit Trigger (INSERT)</td><td>Add alumni</td><td>Row appears in alumni_audit_log</td><td><span class="badge badge-green">✔ Pass</span></td></tr>
+            <tr><td>8</td><td>Audit Trigger (DELETE)</td><td>Delete alumni</td><td>DELETE row in alumni_audit_log</td><td><span class="badge badge-green">✔ Pass</span></td></tr>
+            <tr><td>9</td><td>Edit Alumni (admin)</td><td>Change company field</td><td>Card updates in real time</td><td><span class="badge badge-green">✔ Pass</span></td></tr>
+            <tr><td>10</td><td>Search Filter</td><td>Type company name</td><td>Cards filtered instantly</td><td><span class="badge badge-green">✔ Pass</span></td></tr>
+            <tr><td>11</td><td>Send Message</td><td>Select contact, type msg</td><td>Message appears in thread</td><td><span class="badge badge-green">✔ Pass</span></td></tr>
+            <tr><td>12</td><td>Analytics Tab</td><td>Click Analytics nav</td><td>Charts + tables load from /stats</td><td><span class="badge badge-green">✔ Pass</span></td></tr>
+            <tr><td>13</td><td>JOIN Query (INNER)</td><td>Analytics → Audit Log tab</td><td>alumni × audit_log rows shown</td><td><span class="badge badge-green">✔ Pass</span></td></tr>
+            <tr><td>14</td><td>Non-admin Add Alumni</td><td>Regular user login</td><td>"Add Alumni" tab hidden</td><td><span class="badge badge-green">✔ Pass</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── SCREENSHOTS ── -->
+    <section id="screenshots">
+      <div class="section-label">Section 10</div>
+      <h2>Screenshots</h2>
+      <div class="divider"></div>
+
+      <div class="callout">
+        📸 <strong>To add screenshots:</strong> Replace the placeholder boxes below with actual&nbsp;
+        <code>&lt;img src="screen-login.png"&gt;</code> tags after taking screenshots of the running application.
+        Screenshots should be saved in this <code>report/</code> folder.
+      </div>
+
+      <div class="card-grid">
+        <div class="card" style="text-align:center;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(99,102,241,0.08);border-style:dashed;">
+          <div style="font-size:2.5rem;margin-bottom:0.5rem">🔐</div>
+          <div style="color:#a5b4fc;font-weight:600">Login Page</div>
+          <div style="color:#4b5563;font-size:12px;margin-top:4px">screen-login.png</div>
+        </div>
+        <div class="card" style="text-align:center;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(139,92,246,0.08);border-style:dashed;">
+          <div style="font-size:2.5rem;margin-bottom:0.5rem">📋</div>
+          <div style="color:#c4b5fd;font-weight:600">Register Page</div>
+          <div style="color:#4b5563;font-size:12px;margin-top:4px">screen-register.png</div>
+        </div>
+        <div class="card" style="text-align:center;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(34,211,238,0.06);border-style:dashed;">
+          <div style="font-size:2.5rem;margin-bottom:0.5rem">🎓</div>
+          <div style="color:#67e8f9;font-weight:600">Alumni Dashboard</div>
+          <div style="color:#4b5563;font-size:12px;margin-top:4px">screen-dashboard.png</div>
+        </div>
+        <div class="card" style="text-align:center;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(251,191,36,0.06);border-style:dashed;">
+          <div style="font-size:2.5rem;margin-bottom:0.5rem">➕</div>
+          <div style="color:#fde68a;font-weight:600">Add Alumni Form</div>
+          <div style="color:#4b5563;font-size:12px;margin-top:4px">screen-add.png</div>
+        </div>
+        <div class="card" style="text-align:center;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(244,114,182,0.06);border-style:dashed;">
+          <div style="font-size:2.5rem;margin-bottom:0.5rem">💬</div>
+          <div style="color:#f9a8d4;font-weight:600">Messaging</div>
+          <div style="color:#4b5563;font-size:12px;margin-top:4px">screen-messages.png</div>
+        </div>
+        <div class="card" style="text-align:center;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(74,222,128,0.06);border-style:dashed;">
+          <div style="font-size:2.5rem;margin-bottom:0.5rem">📊</div>
+          <div style="color:#86efac;font-weight:600">Analytics Tab</div>
+          <div style="color:#4b5563;font-size:12px;margin-top:4px">screen-analytics.png</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CONCLUSION ── -->
+    <section id="conclusion">
+      <div class="section-label">Section 11</div>
+      <h2>Conclusion</h2>
+      <div class="divider"></div>
+      <p>
+        The Alumni Portal successfully demonstrates a complete database application development lifecycle.
+        Starting from a real-world problem — the lack of structured alumni management in educational
+        institutions — the project progresses through formal ER modelling, normalised schema design,
+        comprehensive SQL query implementation, and a polished full-stack web application.
+      </p>
+      <p>
+        All four DBMS concepts mandated by the project specification have been implemented:
+        a <strong style="color:white">VIEW</strong> (alumni_summary) for denormalised reporting,
+        two <strong style="color:white">TRIGGERs</strong> (after_alumni_insert and after_alumni_delete)
+        for automated audit logging, <strong style="color:white">JOINs</strong> (INNER and LEFT JOIN)
+        connecting the alumni and audit log tables, and <strong style="color:white">aggregate functions</strong>
+        (COUNT, MAX, MIN, AVG, GROUP BY, HAVING) surfaced live in the Analytics dashboard.
+      </p>
+      <p>
+        The project showcases how a relational database can power a production-quality web application
+        with role-based access control, real-time search, peer messaging, and comprehensive data
+        analytics — all driven by well-structured SQL queries exposed through a REST API.
+      </p>
+    </section>
+
+    <!-- ── FUTURE WORK ── -->
+    <section id="future">
+      <div class="section-label">Section 12</div>
+      <h2>Future Work</h2>
+      <div class="divider"></div>
+      <p>The following enhancements could be made to extend the project beyond its current scope:</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <h4 style="margin-top:0">🔐 Security</h4>
+          <ul style="padding-left:1rem">
+            <li>Hash passwords with bcrypt</li>
+            <li>JWT-based authentication tokens</li>
+            <li>Rate-limiting on auth routes</li>
+            <li>HTTPS / SSL certificate</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4 style="margin-top:0">🗄️ Database</h4>
+          <ul style="padding-left:1rem">
+            <li>Proper FK constraints between tables</li>
+            <li>Indexes on email, company, year</li>
+            <li>Stored procedures for complex operations</li>
+            <li>Database connection pooling</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4 style="margin-top:0">📊 Analytics</h4>
+          <ul style="padding-left:1rem">
+            <li>Interactive Chart.js / D3 graphs</li>
+            <li>Export analytics to CSV / PDF</li>
+            <li>Alumni placement rate dashboard</li>
+            <li>Year-over-year trend charts</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4 style="margin-top:0">🌐 Features</h4>
+          <ul style="padding-left:1rem">
+            <li>Alumni profile photos (file upload)</li>
+            <li>Email notifications for messages</li>
+            <li>Job board / opportunity listings</li>
+            <li>Mobile app (React Native)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4 style="margin-top:0">🚀 Deployment</h4>
+          <ul style="padding-left:1rem">
+            <li>Deploy backend to AWS / Railway</li>
+            <li>Host frontend on Vercel / Netlify</li>
+            <li>Use managed MySQL (PlanetScale / RDS)</li>
+            <li>CI/CD pipeline with GitHub Actions</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4 style="margin-top:0">🤖 AI / ML</h4>
+          <ul style="padding-left:1rem">
+            <li>Smart referral matching using ML</li>
+            <li>Job recommendation engine</li>
+            <li>NLP-powered alumni profile search</li>
+            <li>Predictive placement analytics</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:2rem;text-align:center;background:rgba(99,102,241,0.08)">
+        <p style="color:#a5b4fc;margin:0;font-size:14px">
+          📚 <strong style="color:white">Thank you</strong> for reviewing the Alumni Portal DBMS Final Project Report.<br>
+          All source code is available in the project repository.
+        </p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // Highlight active TOC link on scroll
+  const sections = document.querySelectorAll('section[id], div[id="cover"]');
+  const links = document.querySelectorAll('.toc a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const target = document.querySelector(`.toc a[href="#${entry.target.id}"]`);
+        if (target) target.classList.add('active');
+      }
+    });
+  }, { threshold: 0.25 });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

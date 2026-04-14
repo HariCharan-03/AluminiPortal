@@ -1,0 +1,20 @@
+🚀 Alumni Portal API running on http://localhost:3000
+✅ Connected to MySQL database: alumniDB
+✅ Users table ready
+✅ Alumni table ready
+✅ Audit log table ready
+✅ View alumni_summary ready
+✅ Messages table ready
+✅ Trigger after_alumni_insert ready
+✅ Trigger after_alumni_delete ready
+✅ User logged in: Hariii (user)
+✅ Fetched 60 alumni records
+✅ Fetched 60 alumni records
+✅ Fetched 60 alumni records
+✅ Fetched 60 alumni records
+✅ Stats endpoint served
+✅ Stats endpoint served
+✅ Fetched 60 alumni records
+✅ Fetched 60 alumni records
+✅ Fetched 60 alumni records
+✅ Fetched 60 alumni records

@@ -1,12 +1,13 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast';
 import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
+import Landing from './components/Landing';
 
 function App() {
   return (
-    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Toaster
         position="top-right"
         toastOptions={{
@@ -31,12 +32,12 @@ function App() {
         }}
       />
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
