@@ -12,12 +12,12 @@ A full-stack web application that connects students with alumni for guidance, ne
 
 ## 📌 Features
 
-* 👤 User Registration & Login
-* 🎓 Alumni Listing
-* 💬 Messaging System (basic)
-* 📊 Dashboard for users
-* 🔐 Role-based access (Admin/User)
-* 🌍 Fully deployed full-stack app
+* 👤 Secure User Authentication (Registration & Login)
+* 🎓 Alumni Directory with Structured Profiles
+* 💬 Integrated Messaging System for Student–Alumni Interaction
+* 📊 Personalized User Dashboard for Activity Overview
+* 🔐 Role-Based Access Control (Admin/User Permissions)
+* 🌐 Fully Deployed Full-Stack Application with Cloud Hosting
 
 ---
 
